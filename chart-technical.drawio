@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+  <diagram name="RAG flow" id="rag-flow">
+    <mxGraphModel dx="1422" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1550" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="purpose" value="&lt;b style=&quot;font-size:15px;&quot;&gt;RAG — answer from the docs, not from the model's memory&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot;&gt;retrieval sets the ceiling: the model only ever sees the top-k chunks you fetched&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1440" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gIndex" value="Part 1 — Indexing&#10;runs once, then cached" style="swimlane;whiteSpace=wrap;html=1;container=1;collapsible=0;startSize=50;fontSize=13;fontStyle=1;fontColor=#333333;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="300" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="docs" value="&lt;b&gt;Documents&lt;/b&gt;&lt;br&gt;the raw source of truth&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;knowledge.py&lt;/b&gt;&lt;br&gt;markdown_files · knowledge-base/**/*.md&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gIndex">
+          <mxGeometry x="20" y="60" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk" value="&lt;b&gt;Chunking&lt;/b&gt;&lt;br&gt;split into small overlapping pieces, so a hit points at a paragraph, not a whole file&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;knowledge.py&lt;/b&gt;&lt;br&gt;cut_into_chunks · 500 chars, 200 overlap&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gIndex">
+          <mxGeometry x="20" y="200" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="embc" value="&lt;b&gt;Embedding&lt;/b&gt;&lt;br&gt;each piece becomes a vector that encodes meaning, not keywords&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;openai_client.py&lt;/b&gt;&lt;br&gt;turn_into_numbers_many · text-embedding-3-large&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gIndex">
+          <mxGeometry x="20" y="340" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="store" value="&lt;b&gt;Vector store&lt;/b&gt;&lt;br&gt;chunks + their vectors, saved for reuse&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;knowledge.py&lt;/b&gt;&lt;br&gt;_build_store / load_knowledge · data/store.pkl&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gIndex">
+          <mxGeometry x="20" y="480" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gIndex" source="docs" target="chunk"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gIndex" source="chunk" target="embc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gIndex" source="embc" target="store"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="gQuery" value="Part 2 — Querying&#10;runs on every question" style="swimlane;whiteSpace=wrap;html=1;container=1;collapsible=0;startSize=50;fontSize=13;fontStyle=1;fontColor=#333333;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="380" y="120" width="300" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="q" value="&lt;b&gt;Question&lt;/b&gt;&lt;br&gt;what the user typed&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;app.py&lt;/b&gt;&lt;br&gt;chat · history[-1]&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gQuery">
+          <mxGeometry x="20" y="60" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="embq" value="&lt;b&gt;Embedding&lt;/b&gt;&lt;br&gt;same model as the documents, so the two are comparable&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;openai_client.py&lt;/b&gt;&lt;br&gt;turn_into_numbers · text-embedding-3-large&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gQuery">
+          <mxGeometry x="20" y="200" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gQuery" source="q" target="embq"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="note" value="&lt;b&gt;Both sides use the same embedding model.&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot;&gt;That is the whole trick — question and chunks land in the same vector space, so &quot;closest&quot; means &quot;most similar in meaning&quot;. Comparing is plain math, no API call.&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b3b3b3;dashed=1;fontSize=12;align=left;spacing=10;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="720" y="200" width="300" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gRetrieve" value="Part 3 — Retrieval + generation" style="swimlane;whiteSpace=wrap;html=1;container=1;collapsible=0;startSize=40;fontSize=13;fontStyle=1;fontColor=#333333;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="1440" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="sim" value="&lt;b&gt;Similarity search&lt;/b&gt;&lt;br&gt;score every chunk against the question&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;knowledge.py&lt;/b&gt;&lt;br&gt;how_similar · cosine · full scan&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gRetrieve">
+          <mxGeometry x="20" y="50" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ret" value="&lt;b&gt;Retrieval&lt;/b&gt;&lt;br&gt;keep only the closest chunks&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;knowledge.py&lt;/b&gt;&lt;br&gt;find_closest · top 10&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gRetrieve">
+          <mxGeometry x="300" y="50" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="prompt" value="&lt;b&gt;Prompt&lt;/b&gt;&lt;br&gt;question + retrieved chunks as context&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;openai_client.py&lt;/b&gt;&lt;br&gt;answer_from_context · system + context&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gRetrieve">
+          <mxGeometry x="580" y="50" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="llm" value="&lt;b&gt;Generation&lt;/b&gt;&lt;br&gt;the model writes an answer from that context&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;openai_client.py&lt;/b&gt;&lt;br&gt;answer_from_context · gpt-4.1-nano, temp 0&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gRetrieve">
+          <mxGeometry x="860" y="50" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ans" value="&lt;b&gt;Answer&lt;/b&gt;&lt;br&gt;reply plus the chunks it used&lt;br&gt;&lt;br&gt;&lt;font color=&quot;#7f7f7f&quot; style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;app.py&lt;/b&gt;&lt;br&gt;chat / format_context&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=8;" vertex="1" parent="gRetrieve">
+          <mxGeometry x="1140" y="50" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gRetrieve" source="sim" target="ret"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gRetrieve" source="ret" target="prompt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gRetrieve" source="prompt" target="llm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#666666;" edge="1" parent="gRetrieve" source="llm" target="ans"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="e5" value="&lt;b&gt;knowledge.py&lt;/b&gt; · load_knowledge&lt;br&gt;(cached pickle)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;fontColor=#7f7f7f;verticalAlign=bottom;" edge="1" parent="1" source="store" target="sim"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="one vector" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;strokeColor=#82b366;strokeWidth=2;fontSize=10;fontColor=#7f7f7f;verticalAlign=bottom;" edge="1" parent="1" source="embq" target="sim"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

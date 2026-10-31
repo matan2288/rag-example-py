@@ -1,0 +1,36 @@
+---
+config:
+  layout: fixed
+---
+flowchart LR
+ subgraph Data["Part 1 — Data handling and prepering the context for the LLM"]
+        Store["Vector store"]
+        EmbC["Embedding"]
+        Chunk["Chunking"]
+        Docs["Documents"]
+  end
+ subgraph Ask["Part 2 — Prompting the LLM"]
+        EmbQ["Embedding"]
+        Q["Question"]
+  end
+ subgraph Together["LLM using the context instead of using it's memory"]
+        Ans["Answer"]
+        LLM["Generation"]
+        Prompt["Prompt"]
+        Ret["Retrieval"]
+        Sim["Similarity search"]
+  end
+    Docs --> Chunk
+    Chunk --> EmbC
+    EmbC --> Store
+    Q --> EmbQ
+    Prompt --> LLM
+    Store --> Sim
+    EmbQ --> Sim
+    LLM --> Ans
+    Ret --> Prompt
+    Sim --> Ret
+    Purpose@{ label: "**Purpose: ground the answer in your docs, not the model's memory**" }
+
+    Purpose@{ shape: rect}
+    style Purpose stroke:#000000,stroke-width:1px,stroke-dasharray: 0
